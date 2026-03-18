@@ -11,7 +11,11 @@ done
 
 echo "Deleting fake namespaces..."
 for i in $(seq 0 $nodeNumber); do
-  kubectl delete namespace "fake-namespace-${i}" --ignore-not-found
+  if [[ $i != $nodeNumber ]]; then
+    kubectl delete namespace "fake-namespace-${i}" --ignore-not-found --wait=false
+  else
+    kubectl delete namespace "fake-namespace-${i}" --ignore-not-found
+  fi
 done
 
 echo "Deleting fake KWOK nodes..."

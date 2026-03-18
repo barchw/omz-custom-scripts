@@ -29,6 +29,7 @@ metadata:
     kubernetes.io/role: agent
     node-role.kubernetes.io/agent: ""
     type: kwok
+    kwok-node: "${i}"
   name: kwok-node-${i}
 spec:
   taints: # Avoid scheduling actual running pods to fake Node
@@ -97,6 +98,10 @@ spec:
                 operator: In
                 values:
                 - kwok
+              - key: kwok-node
+                operator: In
+                values:
+                - "${i}"
       # A taints was added to an automatically created Node.
       # You can remove taints of Node or add this tolerations.
       tolerations:
