@@ -38,4 +38,9 @@ spec:
           methods: ["GET","POST"]
           noAuth: true
     " | kubectl apply  -f -
+
+  parent=$(kubectl get gateway -n kyma-system kyma-gateway -o jsonpath='{.spec.servers[0].hosts[0]}' | sed 's/\*\.//')
+  url="https://${host}.${parent}"
+  echo "Deployed httpbin, accessible at:"
+  echo "${url}"
 }
