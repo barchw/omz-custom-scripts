@@ -9,6 +9,17 @@ kubectl apply -f "https://github.com/${KWOK_REPO}/releases/download/${KWOK_LATES
 kubectl apply -f "https://github.com/${KWOK_REPO}/releases/download/${KWOK_LATEST_RELEASE}/stage-fast.yaml"
 kubectl apply -f "https://github.com/${KWOK_REPO}/releases/download/${KWOK_LATEST_RELEASE}/metrics-usage.yaml"
 
+kubectl get configmap kwok -n kube-system -o json \
+| jq -r '.data["kwok.yaml"]' \
+| yq '.options.podPlayStageParallelism = 200' \
+> /tmp/kwok.yaml
+
+kubectl patch configmap kwok -n kube-system --type merge -p "$(jq -n --arg kwok_yaml "$(cat /tmp/kwok.yaml)" '{data: {"kwok.yaml": $kwok_yaml}}')"
+rm /tmp/kwok.yaml
+
+kubectl rollout restart deployment -n kube-system kwok-controller 
+kubectl rollout status deployment -n kube-system kwok-controller 
+
 echo "How many fake Nodes do you want to create?"
 read -r nodeNumber
 
